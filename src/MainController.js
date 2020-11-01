@@ -1,5 +1,7 @@
 const {currentTemperatureByCity} = require('./api/weather')
 
+const Fish = require('../src/models/Fish');
+
 module.exports = {
   async getAllFishes(req, res) {
     const { city } = req.query;
@@ -8,19 +10,10 @@ module.exports = {
 
     let result;
     if(weather.main.temp > 22){
-        result = {
-            body: JSON.stringify(
-            {
-                message: "peixes",
-            }),
-        };
+        const fishes = await Fish.find();
+        result = {fishes: JSON.stringify({ fishes })};
     }else{
-        result = {
-            body: JSON.stringify(
-            {
-                message: "sem peixes",
-            }),
-        };
+        result = {fishes: JSON.stringify([])};
     }
 
     return res.status(200).send(result);
