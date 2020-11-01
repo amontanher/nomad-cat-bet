@@ -1,0 +1,27 @@
+service: nomad-cat-bet
+
+plugins:
+  - serverless-offline
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+functions:
+  fishes:
+    handler: handler
+    events:
+      - http:
+          path: /fishes
+          method: get
+  bet:
+    handler: handler
+    events:
+      - http:
+          path: /bet
+          method: post
+      - http:
+          path: /bet
+          method: get
