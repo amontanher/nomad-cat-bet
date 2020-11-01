@@ -1,6 +1,7 @@
 const {currentTemperatureByCity} = require('./api/weather')
 
 const Fish = require('../src/models/Fish');
+const Bet = require('../src/models/Bet');
 
 module.exports = {
   async getAllFishes(req, res) {
@@ -19,7 +20,16 @@ module.exports = {
     return res.status(200).send(result);
   },
   async createBet(req, res) {
-    const { catName, fishId, totalRation } = req.body;
+    const { catName, fishId, ration } = req.body;
+
+    const bet = await Bet.create({
+        CatName: catName,
+        Fish: fishId,
+        Ration: ration
+    });
+
+    await bet.populate('fish').execPopulate();
+
     return res.status(204).send();
   },
   async getAllBets(req, res){
