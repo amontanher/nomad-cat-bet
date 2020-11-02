@@ -2,26 +2,31 @@ const {currentTemperatureByCity} = require('./api/weather')
 
 const Fish = require('../src/models/Fish');
 const Bet = require('../src/models/Bet');
+const fishValidator = require('../src/validation/FishValidator');
 
 module.exports = {
   async getAllFishes(req, res) {
     const { city } = req.query;
 
-    const weather = await currentTemperatureByCity(city);
+    if(fishValidator.requestIsValid(city)){
+      const weather = await currentTemperatureByCity(city);
 
-    if(weather.cod !== 200){
-      return res.status(weather.cod).send(weather);
-    }
+      if(weather.cod !== 200){
+        return res.status(weather.cod).send(weather);
+      }
 
-    let result;
-    if(weather.main.temp < 22){
-        const fishes = await Fish.find();
-        result = {fishes: fishes};
+      let result;
+      if(weather.main.temp < 22){
+          const fishes = await Fish.find();
+          result = {fishes: fishes};
+      }else{
+          result = {fishes: []};
+      }
+
+      return res.status(200).send(result);
     }else{
-        result = {fishes: []};
+      return res.status(400).send({message: "'City' parameter is required."});
     }
-
-    return res.status(200).send(result);
   },
   async createBet(req, res) {
     const { catName, fishId, ration } = req.body;
