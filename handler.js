@@ -3,12 +3,13 @@ const serverless = require('serverless-http');
 const express = require('express');
 const MainController = require("./src/MainController");
 const mongoose = require('mongoose');
+const config = require('./config');
 const app = express();
 
-app.use(bodyParser.json({ strict: false, limit: '10mb' }));
-
-const uri = "mongodb+srv://aamontanher:aamontanher@clustermongo.yludg.mongodb.net/nomad?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${config.user}:${config.password}@clustermongo.yludg.mongodb.net/${config.dbName}?retryWrites=true&w=majority`;
 mongoose.connect(uri);
+
+app.use(bodyParser.json({ strict: false, limit: '10mb' }));
 
 app.get('/fishes', MainController.getAllFishes);
 app.get('/bet', MainController.getAllBets);
