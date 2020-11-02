@@ -9,6 +9,10 @@ module.exports = {
 
     const weather = await currentTemperatureByCity(city);
 
+    if(weather.cod !== 200){
+      return res.status(weather.cod).send(weather);
+    }
+
     let result;
     if(weather.main.temp < 22){
         const fishes = await Fish.find();
