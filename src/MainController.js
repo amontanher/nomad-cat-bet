@@ -3,6 +3,7 @@ const {currentTemperatureByCity} = require('./api/weather')
 const Fish = require('../src/models/Fish');
 const Bet = require('../src/models/Bet');
 const fishValidator = require('../src/validation/FishValidator');
+const betValidator = require('../src/validation/BetValidator');
 
 module.exports = {
   async getAllFishes(req, res) {
@@ -31,37 +32,44 @@ module.exports = {
   async createBet(req, res) {
     const { catName, fishId, ration } = req.body;
 
-    const catBets = await Bet.find({CatName: catName}).populate('Fish');
+    if(betValidator.postRequestIsValid(catName, fishId, ration)){
+      const catBets = await Bet.find({CatName: catName}).populate('Fish');
 
-    const currentBetFish = catBets.find(c => {
-      if(c.Fish._id.equals(fishId)){
-        return c;
-      }
-    });
-
-    if(currentBetFish){
-      const filter = {_id: currentBetFish._id};
-      const update = {Ration: currentBetFish.Ration + ration};
-      await Bet.findOneAndUpdate(filter, update);
-      return res.status(204).send();
-    }else if(catBets.length >= 2){
-      return res.status(409).send({message: "You can only bet on a maximum of two fishes."})
-    }else{
-      const bet = await Bet.create({
-        CatName: catName,
-        Fish: fishId,
-        Ration: ration
+      const currentBetFish = catBets.find(c => {
+        if(c.Fish._id.equals(fishId)){
+          return c;
+        }
       });
 
-      return res.status(204).send();
+      if(currentBetFish){
+        const filter = {_id: currentBetFish._id};
+        const update = {Ration: currentBetFish.Ration + ration};
+        await Bet.findOneAndUpdate(filter, update);
+        return res.status(204).send();
+      }else if(catBets.length >= 2){
+        return res.status(409).send({message: "You can only bet on a maximum of two fishes."})
+      }else{
+        const bet = await Bet.create({
+          CatName: catName,
+          Fish: fishId,
+          Ration: ration
+        });
+
+        return res.status(204).send();
+      }
+    }else{
+      return res.status(400).send({message: "'CatName', 'FishId' and 'Ration' are required parameters."});
     }
   },
   async getAllBets(req, res){
     const { catName } = req.query;
+    if(betValidator.getRequestIsValid(catName)){
+      const catBets = await Bet.find({CatName: catName});
+      result = {catBets: catBets};
 
-    const catBets = await Bet.find({CatName: catName});
-    result = {catBets: catBets};
-
-    return res.status(200).send(result);
+      return res.status(200).send(result);
+    }else{
+      return res.status(400).send({message: "'CatName' parameter is required."});
+    }
   }
 };
