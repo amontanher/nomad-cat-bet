@@ -22,21 +22,30 @@ module.exports = {
   async createBet(req, res) {
     const { catName, fishId, ration } = req.body;
 
-    const catBets = await Bet.find({CatName: catName});
-    // await bet.populate('fish').execPopulate();
-    if(catBets.length >= 2){
+    const catBets = await Bet.find({CatName: catName}).populate('Fish');
+
+    const currentBetFish = catBets.find(c => {
+      if(c.Fish._id.equals(fishId)){
+        return c;
+      }
+    });
+
+    if(currentBetFish){
+      const filter = {_id: currentBetFish._id};
+      const update = {Ration: currentBetFish.Ration + ration};
+      await Bet.findOneAndUpdate(filter, update);
+      return res.status(204).send();
+    }else if(catBets.length >= 2){
       return res.status(409).send({message: "You can only bet on a maximum of two fishes."})
     }else{
-
-    }
-
-    const bet = await Bet.create({
+      const bet = await Bet.create({
         CatName: catName,
         Fish: fishId,
         Ration: ration
-    });
+      });
 
-    return res.status(204).send();
+      return res.status(204).send();
+    }
   },
   async getAllBets(req, res){
     const { catName } = req.query;
