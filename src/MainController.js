@@ -22,13 +22,20 @@ module.exports = {
   async createBet(req, res) {
     const { catName, fishId, ration } = req.body;
 
+    const catBets = await Bet.find({CatName: catName});
+    // await bet.populate('fish').execPopulate();
+    if(catBets.length >= 2){
+      return res.status(409).send({message: "You can only bet on a maximum of two fishes."})
+    }else{
+
+    }
+
     const bet = await Bet.create({
         CatName: catName,
         Fish: fishId,
         Ration: ration
     });
 
-    await bet.populate('fish').execPopulate();
     return res.status(204).send();
   },
   async getAllBets(req, res){
