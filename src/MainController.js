@@ -33,6 +33,11 @@ module.exports = {
     const { catName, fishId, ration } = req.body;
 
     if(betValidator.postRequestIsValid(catName, fishId, ration)){
+      const fishExists = await fishValidator.checkIfFishExists(fishId);
+      if(!fishExists){
+        return res.status(404).send({message: "Fish not found."});
+      }
+
       const catBets = await Bet.find({CatName: catName}).populate('Fish');
 
       const currentBetFish = catBets.find(c => {
@@ -64,6 +69,12 @@ module.exports = {
   async getAllBets(req, res){
     const { catName } = req.query;
     if(betValidator.getRequestIsValid(catName)){
+
+      const catExists = await betValidator.checkIfCatExists(catName);
+      if(!catExists){
+        return res.status(404).send({message: "Cat not found."});
+      }
+
       const catBets = await Bet.find({CatName: catName});
       result = {catBets: catBets};
 
