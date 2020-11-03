@@ -8,16 +8,17 @@ frameworkVersion: '2'
 provider:
   name: aws
   runtime: nodejs12.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource:
+        - "arn:aws:s3:::*"
 
 functions:
-  fishes:
-    handler: handler
-    events:
-      - http:
-          path: /fishes
-          method: get
-  bet:
-    handler: handler
+  funcoes:
+    handler: handler/app.handler
     events:
       - http:
           path: /bet
@@ -25,3 +26,6 @@ functions:
       - http:
           path: /bet
           method: get
+      - http:
+        path: /fishes
+        method: get
