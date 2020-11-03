@@ -27,5 +27,5 @@ functions:
           path: /bet
           method: get
       - http:
-        path: /fishes
-        method: get
+          path: /fish
+          method: get

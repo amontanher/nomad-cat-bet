@@ -17,7 +17,7 @@ module.exports = {
       }
 
       let result;
-      if(weather.main.temp < 22){
+      if(weather.main.temp > 22){
           const fishes = await Fish.find();
           result = {fishes: fishes};
       }else{

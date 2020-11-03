@@ -11,7 +11,7 @@ mongoose.connect(uri);
 
 app.use(bodyParser.json({ strict: false, limit: '10mb' }));
 
-app.get('/fishes', MainController.getAllFishes);
+app.get('/fish', MainController.getAllFishes);
 app.get('/bet', MainController.getAllBets);
 app.post('/bet', MainController.createBet);
 
